@@ -249,12 +249,12 @@ public class MainActivity extends ActionBarActivity {
                 shareIntent.setPackage("com.instagram.android");
                 try {
                     shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), mPath, "Title", "Description")));
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, "test new app");
+                    //shareIntent.putExtra(Intent.EXTRA_TEXT, "test new app");
                 } catch (FileNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                shareIntent.setType("image/jpeg");
+                shareIntent.setType("image/*");
 
                 startActivity(shareIntent);
             } else {
