@@ -1,8 +1,11 @@
 package com.kritikalerror.instagramuploader;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -31,16 +34,18 @@ public class MainActivity extends ActionBarActivity {
     private Context myContext;
     private LinearLayout cameraPreview;
     private boolean cameraFront = false;
+    private static String mPath;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         myContext = this;
         initialize();
+        mPath = "";
     }
 
     /**
@@ -190,7 +195,9 @@ public class MainActivity extends ActionBarActivity {
     View.OnClickListener captrureListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            // Take picture
             mCamera.takePicture(null, null, mPicture);
+            uploadToInstagram();
         }
     };
 
@@ -209,7 +216,8 @@ public class MainActivity extends ActionBarActivity {
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
+        mPath = mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg";
+        mediaFile = new File(mPath);
 
         return mediaFile;
     }
@@ -218,6 +226,36 @@ public class MainActivity extends ActionBarActivity {
         if (mCamera != null) {
             mCamera.release();
             mCamera = null;
+        }
+    }
+
+    /**
+     * We can't actually upload to Instagram but we can give user choices
+     */
+    private void uploadToInstagram() {
+        if (mPath != null) {
+            Intent intent = getPackageManager().getLaunchIntentForPackage("com.instagram.android");
+            if (intent != null) {
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.setPackage("com.instagram.android");
+                try {
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), mPath, "I am Happy", "Share happy !")));
+                } catch (FileNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                shareIntent.setType("image/jpeg");
+
+                startActivity(shareIntent);
+            } else {
+                // bring user to the market to download the app.
+                // or let them choose an app?
+                intent = new Intent(Intent.ACTION_VIEW);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setData(Uri.parse("market://details?id=" + "com.instagram.android"));
+                startActivity(intent);
+            }
         }
     }
 }
