@@ -1,6 +1,8 @@
 package com.kritikalerror.instagramuploader;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -179,8 +181,12 @@ public class MainActivity extends ActionBarActivity {
                     FileOutputStream fos = new FileOutputStream(pictureFile);
                     fos.write(data);
                     fos.close();
-                    Toast toast = Toast.makeText(myContext, "Picture saved: " + pictureFile.getName(), Toast.LENGTH_LONG);
-                    toast.show();
+                    //Toast toast = Toast.makeText(myContext, "Picture saved: " + pictureFile.getName(), Toast.LENGTH_LONG);
+                    //toast.show();
+
+                    // Upload to Instagram immediately
+                    Toast.makeText(MainActivity.this, "Picture saved to: " + mPath, Toast.LENGTH_LONG).show();
+                    uploadToInstagram();
 
                 } catch (FileNotFoundException e) {
                 } catch (IOException e) {
@@ -192,12 +198,14 @@ public class MainActivity extends ActionBarActivity {
         return picture;
     }
 
+    /**
+     * Listener to detect button press
+     */
     View.OnClickListener captrureListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             // Take picture
             mCamera.takePicture(null, null, mPicture);
-            uploadToInstagram();
         }
     };
 
@@ -233,7 +241,7 @@ public class MainActivity extends ActionBarActivity {
      * We can't actually upload to Instagram but we can give user choices
      */
     private void uploadToInstagram() {
-        if (mPath != null) {
+        if (!mPath.equals("")) {
             Intent intent = getPackageManager().getLaunchIntentForPackage("com.instagram.android");
             if (intent != null) {
                 Intent shareIntent = new Intent();
@@ -249,12 +257,24 @@ public class MainActivity extends ActionBarActivity {
 
                 startActivity(shareIntent);
             } else {
-                // bring user to the market to download the app.
-                // or let them choose an app?
-                intent = new Intent(Intent.ACTION_VIEW);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setData(Uri.parse("market://details?id=" + "com.instagram.android"));
-                startActivity(intent);
+                new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Instagram not found!")
+                    .setMessage("Do you want to download Instagram from the Play Store?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.setData(Uri.parse("market://details?id=" + "com.instagram.android"));
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(MainActivity.this, "Going back to app!", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
             }
         }
     }
