@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -115,7 +113,7 @@ public class MainActivity extends ActionBarActivity {
         cameraPreview.addView(mPreview);
 
         capture = (Button) findViewById(R.id.button_capture);
-        capture.setOnClickListener(captrureListener);
+        capture.setOnClickListener(captureListener);
 
         switchCamera = (Button) findViewById(R.id.button_ChangeCamera);
         switchCamera.setOnClickListener(switchCameraListener);
@@ -201,7 +199,7 @@ public class MainActivity extends ActionBarActivity {
     /**
      * Listener to detect button press
      */
-    View.OnClickListener captrureListener = new View.OnClickListener() {
+    View.OnClickListener captureListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             // Take picture
