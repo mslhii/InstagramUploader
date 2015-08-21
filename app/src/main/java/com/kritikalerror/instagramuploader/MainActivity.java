@@ -214,7 +214,7 @@ public class MainActivity extends ActionBarActivity {
      * @return
      */
     private static File getOutputMediaFile() {
-        File mediaStorageDir = new File("/sdcard/", "JCG Camera");
+        File mediaStorageDir = new File("/sdcard/", "ShotOniPhone6");
 
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
