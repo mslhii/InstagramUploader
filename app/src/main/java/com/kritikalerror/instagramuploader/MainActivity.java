@@ -277,4 +277,12 @@ public class MainActivity extends ActionBarActivity {
             }
         }
     }
+
+    /**
+     * Make picture square before saving
+     */
+    private void cropPictureToSquare()
+    {
+        //
+    }
 }
