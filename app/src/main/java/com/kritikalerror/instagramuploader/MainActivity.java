@@ -112,6 +112,8 @@ public class MainActivity extends ActionBarActivity {
         mPreview = new CameraPreview(myContext, mCamera);
         cameraPreview.addView(mPreview);
 
+        //TODO: add overlays to make preview square
+
         capture = (Button) findViewById(R.id.button_capture);
         capture.setOnClickListener(captureListener);
 
