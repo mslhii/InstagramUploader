@@ -281,6 +281,7 @@ public class MainActivity extends ActionBarActivity {
 
     /**
      * Make picture square before saving
+     * We actually don't need this?
      */
     private void cropPictureToSquare()
     {
