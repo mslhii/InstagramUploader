@@ -279,6 +279,11 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    private void addBorder()
+    {
+        //
+    }
+
     /**
      * Make picture square before saving
      * We actually don't need this?
