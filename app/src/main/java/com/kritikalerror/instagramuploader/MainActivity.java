@@ -279,6 +279,9 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    /**
+     * Add border overlay to picture
+     */
     private void addBorder()
     {
         //
