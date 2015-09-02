@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -295,5 +298,13 @@ public class MainActivity extends ActionBarActivity {
     private void cropPictureToSquare()
     {
         //
+    }
+
+    public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
+        Canvas canvas = new Canvas(bmOverlay);
+        canvas.drawBitmap(bmp1, new Matrix(), null);
+        canvas.drawBitmap(bmp2, 0, 0, null);
+        return bmOverlay;
     }
 }
