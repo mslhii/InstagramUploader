@@ -300,6 +300,12 @@ public class MainActivity extends ActionBarActivity {
         //
     }
 
+    /**
+     * Helper function to overlay main pic on top of iPhone 6 bg
+     * @param bmp1
+     * @param bmp2
+     * @return
+     */
     public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
         Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
