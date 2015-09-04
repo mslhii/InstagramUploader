@@ -284,7 +284,7 @@ public class MainActivity extends ActionBarActivity {
 
     /**
      * Add border overlay to picture
-     * This is the Shot On iPhone 6 border
+     * This is the ShotOniPhone 6 border
      */
     private void addBorder()
     {
