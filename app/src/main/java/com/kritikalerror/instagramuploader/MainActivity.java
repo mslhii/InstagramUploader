@@ -6,13 +6,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,10 +23,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -175,17 +180,28 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
-                File pictureFile = getOutputMediaFile();
+                File pictureFile = getOutputMediaFile(true);
+                //File editedPictureFile = getOutputMediaFile(false);
 
-                if (pictureFile == null) {
+                if (pictureFile == null /*|| editedPictureFile == null*/) {
                     return;
                 }
                 try {
+                    // Upload original picture
                     FileOutputStream fos = new FileOutputStream(pictureFile);
                     fos.write(data);
                     fos.close();
                     //Toast toast = Toast.makeText(myContext, "Picture saved: " + pictureFile.getName(), Toast.LENGTH_LONG);
                     //toast.show();
+
+                    // Edit and upload new picture
+//                    FileOutputStream editfos = new FileOutputStream(editedPictureFile);
+//                    Bitmap originalPic = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                    //imageOverlay(originalPic, originalPic);
+//                    Bitmap newPic = addBorder(originalPic, 2);
+//                    byte[] newData = convertBitmapToByteArray(newPic);
+//                    editfos.write(newData);
+//                    editfos.close();
 
                     // Upload to Instagram immediately
                     Toast.makeText(MainActivity.this, "Picture saved to: " + mPath, Toast.LENGTH_LONG).show();
@@ -216,7 +232,7 @@ public class MainActivity extends ActionBarActivity {
      * Save picture to folder
      * @return
      */
-    private static File getOutputMediaFile() {
+    private static File getOutputMediaFile(boolean isOriginal) {
         File mediaStorageDir = new File("/sdcard/", "ShotOniPhone6");
 
         if (!mediaStorageDir.exists()) {
@@ -227,7 +243,12 @@ public class MainActivity extends ActionBarActivity {
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
-        mPath = mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg";
+        String imageHeader = "IMG_";
+        if(!isOriginal)
+        {
+            imageHeader = "EDIT_IMG_";
+        }
+        mPath = mediaStorageDir.getPath() + File.separator + imageHeader + timeStamp + ".jpg";
         mediaFile = new File(mPath);
 
         return mediaFile;
@@ -245,17 +266,27 @@ public class MainActivity extends ActionBarActivity {
      */
     private void uploadToInstagram() {
         if (!mPath.equals("")) {
+            Log.e("INSTAUPLOAD", "Uploading to Instagram!");
             Intent intent = getPackageManager().getLaunchIntentForPackage("com.instagram.android");
             if (intent != null) {
                 Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);
                 shareIntent.setPackage("com.instagram.android");
+                /*
                 try {
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), mPath, "Title", "Description")));
+                    Log.e("INSTAUPLOADD", mPath);
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(),
+                            mPath, "Title", "Description")));
                 } catch (FileNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+                */
+                File media = new File(mPath);
+                Uri uri = Uri.fromFile(media);
+
+                // Add the URI to the Intent.
+                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
                 shareIntent.setType("image/*");
 
                 startActivity(shareIntent);
@@ -280,15 +311,45 @@ public class MainActivity extends ActionBarActivity {
                     .show();
             }
         }
+        else
+        {
+            Log.e("INSTAFAIL", "mPath is: " + mPath);
+        }
+    }
+
+    private void createInstagramIntent(String type, String mediaPath){
+        if (!mPath.equals("")) {
+            // Create the new Intent using the 'Send' action.
+            Intent share = new Intent(Intent.ACTION_SEND);
+
+            // Set the MIME type
+            share.setType(type);
+
+            // Create the URI from the media
+            File media = new File(mediaPath);
+            Uri uri = Uri.fromFile(media);
+
+            // Add the URI to the Intent.
+            share.putExtra(Intent.EXTRA_STREAM, uri);
+
+            // Broadcast the Intent.
+            startActivity(Intent.createChooser(share, "Share to"));
+        }
     }
 
     /**
      * Add border overlay to picture
      * This is the ShotOniPhone 6 border
      */
-    private void addBorder()
+    private Bitmap addBorder(Bitmap bmp, int borderSize)
     {
-        //
+        Bitmap bmpWithBorder = Bitmap.createBitmap(bmp.getWidth() + borderSize * 2,
+                bmp.getHeight() + borderSize * 2,
+                bmp.getConfig());
+        Canvas canvas = new Canvas(bmpWithBorder);
+        canvas.drawColor(Color.WHITE);
+        canvas.drawBitmap(bmp, borderSize, borderSize, null);
+        return bmpWithBorder;
     }
 
     /**
@@ -302,15 +363,36 @@ public class MainActivity extends ActionBarActivity {
 
     /**
      * Helper function to overlay main pic on top of iPhone 6 bg
-     * @param bmp1
-     * @param bmp2
+     * @param firstBitmap
+     * @param secondBitmap
      * @return
      */
-    public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
-        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
+    public static Bitmap imageOverlay(Bitmap firstBitmap, Bitmap secondBitmap) {
+        Bitmap bmOverlay = Bitmap.createBitmap(firstBitmap.getWidth(), firstBitmap.getHeight(), firstBitmap.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
-        canvas.drawBitmap(bmp1, new Matrix(), null);
-        canvas.drawBitmap(bmp2, 0, 0, null);
+        canvas.drawBitmap(firstBitmap, new Matrix(), null);
+        canvas.drawBitmap(secondBitmap, 0, 0, null);
         return bmOverlay;
+    }
+
+    public static byte[] convertBitmapToByteArray(Bitmap bmp) {
+        //int bytes = b.getWidth()*b.getHeight()*4; for 64 bit images
+        int bytes = bmp.getByteCount();
+        ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer
+        bmp.copyPixelsToBuffer(buffer); //Move the byte data to the buffer
+
+        return buffer.array();
+    }
+
+    /**
+     *
+     * @param filePath
+     * @return
+     */
+    public static byte[] convertPicToByteArray(String filePath) {
+        Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+        ByteArrayOutputStream blob = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, blob);
+        return blob.toByteArray();
     }
 }
