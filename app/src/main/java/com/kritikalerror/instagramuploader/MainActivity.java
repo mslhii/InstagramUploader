@@ -12,7 +12,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,7 +39,7 @@ public class MainActivity extends ActionBarActivity {
     private Camera mCamera;
     private CameraPreview mPreview;
     private Camera.PictureCallback mPicture;
-    private Button capture, switchCamera;
+    private Button captureButton, switchCamera;
     private Context myContext;
     private LinearLayout cameraPreview;
     private boolean cameraFront = false;
@@ -129,17 +128,30 @@ public class MainActivity extends ActionBarActivity {
 
         //TODO: add overlays to make preview square
 
-        capture = (Button) findViewById(R.id.button_capture);
-        capture.setOnClickListener(captureListener);
+        captureButton = (Button) findViewById(R.id.button_capture);
+        captureButton.setOnClickListener(captureListener);
 
         switchCamera = (Button) findViewById(R.id.button_ChangeCamera);
         switchCamera.setOnClickListener(switchCameraListener);
         */
 
-        // Start CameraActivity
-        Intent startCustomCameraIntent = new Intent(this, CameraActivity.class);
-        startActivityForResult(startCustomCameraIntent, REQUEST_CAMERA);
+        captureButton = (Button) findViewById(R.id.button_capture);
+        captureButton.setOnClickListener(captureListener);
     }
+
+    /**
+     * Listener to detect button press
+     */
+    View.OnClickListener captureListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            // Take picture
+            //mCamera.takePicture(null, null, mPicture);
+            // Start CameraActivity
+            Intent startCustomCameraIntent = new Intent(MainActivity.this, CameraActivity.class);
+            startActivityForResult(startCustomCameraIntent, REQUEST_CAMERA);
+        }
+    };
 
     // Receive Uri of saved square photo
     @Override
@@ -244,17 +256,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     /**
-     * Listener to detect button press
-     */
-    View.OnClickListener captureListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            // Take picture
-            mCamera.takePicture(null, null, mPicture);
-        }
-    };
-
-    /**
      * Save picture to folder
      * @return
      */
@@ -311,8 +312,11 @@ public class MainActivity extends ActionBarActivity {
                     e.printStackTrace();
                 }
                 */
+
+                Log.e("INSTAUPLOADD", mPath);
                 File media = new File(mPath);
-                Uri uri = Uri.fromFile(media);
+                //Uri uri = Uri.fromFile(media);
+                Uri uri = Uri.parse(mPath);
 
                 // Add the URI to the Intent.
                 shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
