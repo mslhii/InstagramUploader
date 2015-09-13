@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.desmond.squarecamera.CameraActivity;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,6 +45,8 @@ public class MainActivity extends ActionBarActivity {
     private LinearLayout cameraPreview;
     private boolean cameraFront = false;
     private static String mPath;
+
+    private static final int REQUEST_CAMERA = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,6 +100,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void onResume() {
         super.onResume();
+        /*
         if (!hasCamera(myContext)) {
             Toast toast = Toast.makeText(myContext, "Sorry, your phone does not have a camera!", Toast.LENGTH_LONG);
             toast.show();
@@ -110,12 +115,14 @@ public class MainActivity extends ActionBarActivity {
             mPicture = getPictureCallback();
             mPreview.refreshCamera(mCamera);
         }
+        */
     }
 
     /**
      * Initialize preview surface
      */
     public void initialize() {
+        /*
         cameraPreview = (LinearLayout) findViewById(R.id.camera_preview);
         mPreview = new CameraPreview(myContext, mCamera);
         cameraPreview.addView(mPreview);
@@ -127,6 +134,25 @@ public class MainActivity extends ActionBarActivity {
 
         switchCamera = (Button) findViewById(R.id.button_ChangeCamera);
         switchCamera.setOnClickListener(switchCameraListener);
+        */
+
+        // Start CameraActivity
+        Intent startCustomCameraIntent = new Intent(this, CameraActivity.class);
+        startActivityForResult(startCustomCameraIntent, REQUEST_CAMERA);
+    }
+
+    // Receive Uri of saved square photo
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK) return;
+
+        if (requestCode == REQUEST_CAMERA) {
+            Uri photoUri = data.getData();
+            mPath = photoUri.toString();
+            Log.e("URI", mPath);
+            uploadToInstagram();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     View.OnClickListener switchCameraListener = new View.OnClickListener() {
@@ -164,7 +190,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        releaseCamera();
+        //releaseCamera();
     }
 
     private boolean hasCamera(Context context) {
@@ -260,6 +286,9 @@ public class MainActivity extends ActionBarActivity {
             mCamera = null;
         }
     }
+
+    //file:///storage/emulated/0/Pictures/SquareCamera/IMG_20150912_185608.jpg
+
 
     /**
      * We can't actually upload to Instagram but we can give user choices
