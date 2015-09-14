@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -162,9 +163,55 @@ public class MainActivity extends ActionBarActivity {
             Uri photoUri = data.getData();
             mPath = photoUri.toString();
             Log.e("URI", mPath);
+            Bitmap originalPic = BitmapFactory.decodeFile(mPath.replace("file://", ""));
+
+            if (originalPic != null) {
+                //Bitmap newPic = addBorder(originalPic, 2);
+                Bitmap banner = BitmapFactory.decodeResource(getResources(),
+                        R.drawable.banner);
+                Bitmap overlay = BitmapFactory.decodeResource(getResources(),
+                        R.drawable.shotiphoneoverlay);
+                Bitmap firstPic = imageOverlay(originalPic, banner);
+                Bitmap newPic = imageOverlay(firstPic, overlay);
+                saveBitmapToJPG(newPic);
+            }
+            else {
+                Log.e("FILEOPEN", "Cannot open file!");
+                Toast.makeText(getApplicationContext(),
+                        "Cannot open file!", Toast.LENGTH_SHORT).show();
+            }
+
             uploadToInstagram();
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void saveBitmapToJPG(Bitmap bmp) {
+        //create a file to write bitmap data
+        //String oldPath = mPath;
+        //mPath =  mPath.replace(".jpg", "") + "_EDITED.jpg";
+        //File file = new File(mPath);
+        File file = getOutputMediaFile(false);
+
+        if (file == null) {
+            return;
+        }
+
+
+        //Convert bitmap to byte array
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
+        byte[] bitmapdata = bos.toByteArray();
+
+        //write the bytes in file
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+        }
     }
 
     View.OnClickListener switchCameraListener = new View.OnClickListener() {
@@ -260,7 +307,8 @@ public class MainActivity extends ActionBarActivity {
      * @return
      */
     private static File getOutputMediaFile(boolean isOriginal) {
-        File mediaStorageDir = new File("/sdcard/", "ShotOniPhone6");
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory().getPath(),
+                "ShotOniPhone6");
 
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
@@ -314,9 +362,8 @@ public class MainActivity extends ActionBarActivity {
                 */
 
                 Log.e("INSTAUPLOADD", mPath);
-                File media = new File(mPath);
                 //Uri uri = Uri.fromFile(media);
-                Uri uri = Uri.parse(mPath);
+                Uri uri = Uri.parse("file://" + mPath);
 
                 // Add the URI to the Intent.
                 shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
@@ -360,7 +407,8 @@ public class MainActivity extends ActionBarActivity {
 
             // Create the URI from the media
             File media = new File(mediaPath);
-            Uri uri = Uri.fromFile(media);
+            //Uri uri = Uri.fromFile(media);
+            Uri uri = Uri.parse(mediaPath);
 
             // Add the URI to the Intent.
             share.putExtra(Intent.EXTRA_STREAM, uri);
@@ -404,7 +452,13 @@ public class MainActivity extends ActionBarActivity {
         Bitmap bmOverlay = Bitmap.createBitmap(firstBitmap.getWidth(), firstBitmap.getHeight(), firstBitmap.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
         canvas.drawBitmap(firstBitmap, new Matrix(), null);
-        canvas.drawBitmap(secondBitmap, 0, 0, null);
+        //canvas.drawBitmap(secondBitmap, 0, 0, null);
+        //canvas.drawBitmap(secondBitmap,
+        //        canvas.getWidth() - firstBitmap.getWidth(),
+        //        canvas.getHeight() - firstBitmap.getHeight(), null);
+        canvas.drawBitmap(secondBitmap,
+                (firstBitmap.getWidth() / 2) - (secondBitmap.getWidth() / 2),
+                firstBitmap.getHeight() - (secondBitmap.getHeight()), null);
         return bmOverlay;
     }
 
@@ -429,3 +483,9 @@ public class MainActivity extends ActionBarActivity {
         return blob.toByteArray();
     }
 }
+
+/*
+09-14 00:25:56.231  30066-30066/com.kritikalerror.instagramuploader E/URI﹕ file:///storage/emulated/0/Pictures/SquareCamera/IMG_20150914_002556.jpg
+09-14 00:25:56.581  30066-30066/com.kritikalerror.instagramuploader E/INSTAUPLOAD﹕ Uploading to Instagram!
+09-14 00:25:56.581  30066-30066/com.kritikalerror.instagramuploader E/INSTAUPLOADD﹕ /storage/emulated/0/ShotOniPhone6/EDIT_IMG_20150914_002556.jpg
+ */
