@@ -14,12 +14,15 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -40,7 +43,7 @@ public class MainActivity extends ActionBarActivity {
     private Camera mCamera;
     private CameraPreview mPreview;
     private Camera.PictureCallback mPicture;
-    private Button captureButton, switchCamera;
+    private ImageButton captureButton, switchCamera;
     private Context myContext;
     private LinearLayout cameraPreview;
     private boolean cameraFront = false;
@@ -127,8 +130,6 @@ public class MainActivity extends ActionBarActivity {
         mPreview = new CameraPreview(myContext, mCamera);
         cameraPreview.addView(mPreview);
 
-        //TODO: add overlays to make preview square
-
         captureButton = (Button) findViewById(R.id.button_capture);
         captureButton.setOnClickListener(captureListener);
 
@@ -136,7 +137,15 @@ public class MainActivity extends ActionBarActivity {
         switchCamera.setOnClickListener(switchCameraListener);
         */
 
-        captureButton = (Button) findViewById(R.id.button_capture);
+        // Add ads
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("YOUR_DEVICE_HASH")
+                .build();
+        mAdView.loadAd(adRequest);
+
+
+        captureButton = (ImageButton) findViewById(R.id.button_capture);
         captureButton.setOnClickListener(captureListener);
     }
 
