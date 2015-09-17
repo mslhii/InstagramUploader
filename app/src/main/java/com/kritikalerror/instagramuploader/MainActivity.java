@@ -21,7 +21,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -40,12 +39,8 @@ import java.util.Date;
 
 public class MainActivity extends ActionBarActivity {
 
-    private Camera mCamera;
-    private CameraPreview mPreview;
-    private Camera.PictureCallback mPicture;
-    private ImageButton captureButton, switchCamera;
-    private Context myContext;
-    private LinearLayout cameraPreview;
+    private ImageButton captureButton;
+    private Context mContext;
     private boolean cameraFront = false;
     private static String mPath;
 
@@ -58,85 +53,19 @@ public class MainActivity extends ActionBarActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        myContext = this;
+        mContext = this;
         initialize();
         mPath = "";
     }
 
-    /**
-     * Check to see if we have a front facing camera
-     * @return
-     */
-    private int findFrontFacingCamera() {
-        int cameraId = -1;
-        int numberOfCameras = Camera.getNumberOfCameras();
-        for (int i = 0; i < numberOfCameras; i++) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                cameraId = i;
-                cameraFront = true;
-                break;
-            }
-        }
-        return cameraId;
-    }
-
-    /**
-     * Helper function to find back camera
-     * @return
-     */
-    private int findBackFacingCamera() {
-        int cameraId = -1;
-        int numberOfCameras = Camera.getNumberOfCameras();
-        for (int i = 0; i < numberOfCameras; i++) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                cameraId = i;
-                cameraFront = false;
-                break;
-            }
-        }
-        return cameraId;
-    }
-
     public void onResume() {
         super.onResume();
-        /*
-        if (!hasCamera(myContext)) {
-            Toast toast = Toast.makeText(myContext, "Sorry, your phone does not have a camera!", Toast.LENGTH_LONG);
-            toast.show();
-            finish();
-        }
-        if (mCamera == null) {
-            if (findFrontFacingCamera() < 0) {
-                Toast.makeText(this, "No front facing camera found.", Toast.LENGTH_LONG).show();
-                switchCamera.setVisibility(View.GONE);
-            }
-            mCamera = Camera.open(findBackFacingCamera());
-            mPicture = getPictureCallback();
-            mPreview.refreshCamera(mCamera);
-        }
-        */
     }
 
     /**
      * Initialize preview surface
      */
     public void initialize() {
-        /*
-        cameraPreview = (LinearLayout) findViewById(R.id.camera_preview);
-        mPreview = new CameraPreview(myContext, mCamera);
-        cameraPreview.addView(mPreview);
-
-        captureButton = (Button) findViewById(R.id.button_capture);
-        captureButton.setOnClickListener(captureListener);
-
-        switchCamera = (Button) findViewById(R.id.button_ChangeCamera);
-        switchCamera.setOnClickListener(switchCameraListener);
-        */
-
         // Add ads
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
@@ -155,8 +84,6 @@ public class MainActivity extends ActionBarActivity {
     View.OnClickListener captureListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Take picture
-            //mCamera.takePicture(null, null, mPicture);
             // Start CameraActivity
             Intent startCustomCameraIntent = new Intent(MainActivity.this, CameraActivity.class);
             startActivityForResult(startCustomCameraIntent, REQUEST_CAMERA);
@@ -196,16 +123,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void saveBitmapToJPG(Bitmap bmp) {
-        //create a file to write bitmap data
-        //String oldPath = mPath;
-        //mPath =  mPath.replace(".jpg", "") + "_EDITED.jpg";
-        //File file = new File(mPath);
         File file = getOutputMediaFile(false);
 
         if (file == null) {
             return;
         }
-
 
         //Convert bitmap to byte array
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -223,92 +145,9 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    View.OnClickListener switchCameraListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int camerasNumber = Camera.getNumberOfCameras();
-            if (camerasNumber > 1) {
-                releaseCamera();
-                chooseCamera();
-            } else {
-                Toast toast = Toast.makeText(myContext, "Sorry, your phone has only one camera!", Toast.LENGTH_LONG);
-                toast.show();
-            }
-        }
-    };
-
-    public void chooseCamera() {
-        if (cameraFront) {
-            int cameraId = findBackFacingCamera();
-            if (cameraId >= 0) {
-                mCamera = Camera.open(cameraId);
-                mPicture = getPictureCallback();
-                mPreview.refreshCamera(mCamera);
-            }
-        } else {
-            int cameraId = findFrontFacingCamera();
-            if (cameraId >= 0) {
-                mCamera = Camera.open(cameraId);
-                mPicture = getPictureCallback();
-                mPreview.refreshCamera(mCamera);
-            }
-        }
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
-        //releaseCamera();
-    }
-
-    private boolean hasCamera(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private Camera.PictureCallback getPictureCallback() {
-        Camera.PictureCallback picture = new Camera.PictureCallback() {
-
-            @Override
-            public void onPictureTaken(byte[] data, Camera camera) {
-                File pictureFile = getOutputMediaFile(true);
-                //File editedPictureFile = getOutputMediaFile(false);
-
-                if (pictureFile == null /*|| editedPictureFile == null*/) {
-                    return;
-                }
-                try {
-                    // Upload original picture
-                    FileOutputStream fos = new FileOutputStream(pictureFile);
-                    fos.write(data);
-                    fos.close();
-                    //Toast toast = Toast.makeText(myContext, "Picture saved: " + pictureFile.getName(), Toast.LENGTH_LONG);
-                    //toast.show();
-
-                    // Edit and upload new picture
-//                    FileOutputStream editfos = new FileOutputStream(editedPictureFile);
-//                    Bitmap originalPic = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                    //imageOverlay(originalPic, originalPic);
-//                    Bitmap newPic = addBorder(originalPic, 2);
-//                    byte[] newData = convertBitmapToByteArray(newPic);
-//                    editfos.write(newData);
-//                    editfos.close();
-
-                    // Upload to Instagram immediately
-                    Toast.makeText(MainActivity.this, "Picture saved to: " + mPath, Toast.LENGTH_LONG).show();
-                    uploadToInstagram();
-
-                } catch (FileNotFoundException e) {
-                } catch (IOException e) {
-                }
-
-                mPreview.refreshCamera(mCamera);
-            }
-        };
-        return picture;
     }
 
     /**
@@ -337,16 +176,6 @@ public class MainActivity extends ActionBarActivity {
 
         return mediaFile;
     }
-
-    private void releaseCamera() {
-        if (mCamera != null) {
-            mCamera.release();
-            mCamera = null;
-        }
-    }
-
-    //file:///storage/emulated/0/Pictures/SquareCamera/IMG_20150912_185608.jpg
-
 
     /**
      * We can't actually upload to Instagram but we can give user choices
@@ -443,15 +272,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     /**
-     * Make picture square before saving
-     * We actually don't need this?
-     */
-    private void cropPictureToSquare()
-    {
-        //
-    }
-
-    /**
      * Helper function to overlay main pic on top of iPhone 6 bg
      * @param firstBitmap
      * @param secondBitmap
@@ -492,9 +312,3 @@ public class MainActivity extends ActionBarActivity {
         return blob.toByteArray();
     }
 }
-
-/*
-09-14 00:25:56.231  30066-30066/com.kritikalerror.instagramuploader E/URI﹕ file:///storage/emulated/0/Pictures/SquareCamera/IMG_20150914_002556.jpg
-09-14 00:25:56.581  30066-30066/com.kritikalerror.instagramuploader E/INSTAUPLOAD﹕ Uploading to Instagram!
-09-14 00:25:56.581  30066-30066/com.kritikalerror.instagramuploader E/INSTAUPLOADD﹕ /storage/emulated/0/ShotOniPhone6/EDIT_IMG_20150914_002556.jpg
- */
