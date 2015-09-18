@@ -99,10 +99,12 @@ public class MainActivity extends ActionBarActivity {
             Uri photoUri = data.getData();
             mPath = photoUri.toString();
             Log.e("URI", mPath);
+            Toast.makeText(getApplicationContext(),
+                    "Your original picture has been saved to: " + mPath,
+                    Toast.LENGTH_LONG).show();
             Bitmap originalPic = BitmapFactory.decodeFile(mPath.replace("file://", ""));
 
             if (originalPic != null) {
-                //Bitmap newPic = addBorder(originalPic, 2);
                 Bitmap banner = BitmapFactory.decodeResource(getResources(),
                         R.drawable.banner);
                 Bitmap overlay = BitmapFactory.decodeResource(getResources(),
@@ -114,7 +116,7 @@ public class MainActivity extends ActionBarActivity {
             else {
                 Log.e("FILEOPEN", "Cannot open file!");
                 Toast.makeText(getApplicationContext(),
-                        "Cannot open file!", Toast.LENGTH_SHORT).show();
+                        "Cannot open file!", Toast.LENGTH_LONG).show();
             }
 
             uploadToInstagram();
@@ -200,7 +202,9 @@ public class MainActivity extends ActionBarActivity {
                 */
 
                 Log.e("INSTAUPLOADD", mPath);
-                //Uri uri = Uri.fromFile(media);
+                Toast.makeText(getApplicationContext()
+                        , "Your edited file has been saved to: " + mPath
+                        , Toast.LENGTH_LONG).show();
                 Uri uri = Uri.parse("file://" + mPath);
 
                 // Add the URI to the Intent.
@@ -281,10 +285,6 @@ public class MainActivity extends ActionBarActivity {
         Bitmap bmOverlay = Bitmap.createBitmap(firstBitmap.getWidth(), firstBitmap.getHeight(), firstBitmap.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
         canvas.drawBitmap(firstBitmap, new Matrix(), null);
-        //canvas.drawBitmap(secondBitmap, 0, 0, null);
-        //canvas.drawBitmap(secondBitmap,
-        //        canvas.getWidth() - firstBitmap.getWidth(),
-        //        canvas.getHeight() - firstBitmap.getHeight(), null);
         canvas.drawBitmap(secondBitmap,
                 (firstBitmap.getWidth() / 2) - (secondBitmap.getWidth() / 2),
                 firstBitmap.getHeight() - (secondBitmap.getHeight()), null);
