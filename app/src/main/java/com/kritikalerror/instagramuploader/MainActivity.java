@@ -105,6 +105,9 @@ public class MainActivity extends ActionBarActivity {
             Bitmap originalPic = BitmapFactory.decodeFile(mPath.replace("file://", ""));
 
             if (originalPic != null) {
+                Toast.makeText(getApplicationContext(),
+                        "Constructing poster from original pic...",
+                        Toast.LENGTH_SHORT).show();
                 Bitmap banner = BitmapFactory.decodeResource(getResources(),
                         R.drawable.banner);
                 Bitmap overlay = BitmapFactory.decodeResource(getResources(),
@@ -112,6 +115,9 @@ public class MainActivity extends ActionBarActivity {
                 Bitmap firstPic = imageOverlay(originalPic, banner);
                 Bitmap newPic = imageOverlay(firstPic, overlay);
                 saveBitmapToJPG(newPic);
+                Toast.makeText(getApplicationContext()
+                        , "Your edited file has been saved to: " + mPath
+                        , Toast.LENGTH_LONG).show();
             }
             else {
                 Log.e("FILEOPEN", "Cannot open file!");
@@ -157,7 +163,8 @@ public class MainActivity extends ActionBarActivity {
      * @return
      */
     private static File getOutputMediaFile(boolean isOriginal) {
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory().getPath(),
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory().getPath() +
+                "Pictures/",
                 "ShotOniPhone6");
 
         if (!mediaStorageDir.exists()) {
@@ -202,9 +209,6 @@ public class MainActivity extends ActionBarActivity {
                 */
 
                 Log.e("INSTAUPLOADD", mPath);
-                Toast.makeText(getApplicationContext()
-                        , "Your edited file has been saved to: " + mPath
-                        , Toast.LENGTH_LONG).show();
                 Uri uri = Uri.parse("file://" + mPath);
 
                 // Add the URI to the Intent.
