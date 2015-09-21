@@ -4,13 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
@@ -22,7 +20,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.desmond.squarecamera.CameraActivity;
@@ -41,7 +38,6 @@ public class MainActivity extends ActionBarActivity {
 
     private ImageButton captureButton;
     private Context mContext;
-    private boolean cameraFront = false;
     private static String mPath;
 
     private static final int REQUEST_CAMERA = 0;
@@ -99,9 +95,9 @@ public class MainActivity extends ActionBarActivity {
             Uri photoUri = data.getData();
             mPath = photoUri.toString();
             Log.e("URI", mPath);
-            Toast.makeText(getApplicationContext(),
-                    "Your original picture has been saved to: " + mPath,
-                    Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(),
+//                    "Your original picture has been saved to: " + mPath,
+//                    Toast.LENGTH_LONG).show();
             Bitmap originalPic = BitmapFactory.decodeFile(mPath.replace("file://", ""));
 
             if (originalPic != null) {
@@ -114,10 +110,23 @@ public class MainActivity extends ActionBarActivity {
                         R.drawable.shotiphoneoverlay);
                 Bitmap firstPic = imageOverlay(originalPic, banner);
                 Bitmap newPic = imageOverlay(firstPic, overlay);
+                String oldPath = mPath;
                 saveBitmapToJPG(newPic);
-                Toast.makeText(getApplicationContext()
-                        , "Your edited file has been saved to: " + mPath
-                        , Toast.LENGTH_LONG).show();
+                if (oldPath.equals(mPath)) {
+                    Toast.makeText(getApplicationContext()
+                            , "Cannot create ShotOniPhone6 poster! Cannot create directory to save in"
+                            , Toast.LENGTH_LONG).show();
+                    return;
+                }
+//                Toast.makeText(getApplicationContext()
+//                        , "Your edited file has been saved to: " + mPath
+//                        , Toast.LENGTH_LONG).show();
+
+                // Refresh gallery
+                Intent mediaScannerIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                Uri fileContentUri = Uri.parse("file://" + mPath);
+                mediaScannerIntent.setData(fileContentUri);
+                getApplicationContext().sendBroadcast(mediaScannerIntent);
             }
             else {
                 Log.e("FILEOPEN", "Cannot open file!");
@@ -131,7 +140,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void saveBitmapToJPG(Bitmap bmp) {
-        File file = getOutputMediaFile(false);
+        File file = getOutputMediaFile();
 
         if (file == null) {
             return;
@@ -162,24 +171,20 @@ public class MainActivity extends ActionBarActivity {
      * Save picture to folder
      * @return
      */
-    private static File getOutputMediaFile(boolean isOriginal) {
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory().getPath() +
-                "Pictures/",
+    private static File getOutputMediaFile() {
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 "ShotOniPhone6");
 
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
+                Log.e("FAILFILE", "Cannot make directory!");
                 return null;
             }
         }
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
-        String imageHeader = "IMG_";
-        if(!isOriginal)
-        {
-            imageHeader = "EDIT_IMG_";
-        }
+        String imageHeader = "EDIT_IMG_";
         mPath = mediaStorageDir.getPath() + File.separator + imageHeader + timeStamp + ".jpg";
         mediaFile = new File(mPath);
 
@@ -197,16 +202,6 @@ public class MainActivity extends ActionBarActivity {
                 Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);
                 shareIntent.setPackage("com.instagram.android");
-                /*
-                try {
-                    Log.e("INSTAUPLOADD", mPath);
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(),
-                            mPath, "Title", "Description")));
-                } catch (FileNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                */
 
                 Log.e("INSTAUPLOADD", mPath);
                 Uri uri = Uri.parse("file://" + mPath);
@@ -265,21 +260,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     /**
-     * Add border overlay to picture
-     * This is the ShotOniPhone 6 border
-     */
-    private Bitmap addBorder(Bitmap bmp, int borderSize)
-    {
-        Bitmap bmpWithBorder = Bitmap.createBitmap(bmp.getWidth() + borderSize * 2,
-                bmp.getHeight() + borderSize * 2,
-                bmp.getConfig());
-        Canvas canvas = new Canvas(bmpWithBorder);
-        canvas.drawColor(Color.WHITE);
-        canvas.drawBitmap(bmp, borderSize, borderSize, null);
-        return bmpWithBorder;
-    }
-
-    /**
      * Helper function to overlay main pic on top of iPhone 6 bg
      * @param firstBitmap
      * @param secondBitmap
@@ -293,26 +273,5 @@ public class MainActivity extends ActionBarActivity {
                 (firstBitmap.getWidth() / 2) - (secondBitmap.getWidth() / 2),
                 firstBitmap.getHeight() - (secondBitmap.getHeight()), null);
         return bmOverlay;
-    }
-
-    public static byte[] convertBitmapToByteArray(Bitmap bmp) {
-        //int bytes = b.getWidth()*b.getHeight()*4; for 64 bit images
-        int bytes = bmp.getByteCount();
-        ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer
-        bmp.copyPixelsToBuffer(buffer); //Move the byte data to the buffer
-
-        return buffer.array();
-    }
-
-    /**
-     *
-     * @param filePath
-     * @return
-     */
-    public static byte[] convertPicToByteArray(String filePath) {
-        Bitmap bitmap = BitmapFactory.decodeFile(filePath);
-        ByteArrayOutputStream blob = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, blob);
-        return blob.toByteArray();
     }
 }
