@@ -36,7 +36,6 @@ import java.util.Date;
 
 public class MainActivity extends ActionBarActivity {
 
-    private ImageButton captureButton;
     private Context mContext;
     private static String mPath;
 
@@ -69,13 +68,15 @@ public class MainActivity extends ActionBarActivity {
                 .build();
         mAdView.loadAd(adRequest);
 
-
-        captureButton = (ImageButton) findViewById(R.id.button_capture);
+        ImageButton captureButton = (ImageButton) findViewById(R.id.button_capture);
         captureButton.setOnClickListener(captureListener);
+
+        ImageButton galleryButton = (ImageButton) findViewById(R.id.button_gallery);
+        galleryButton.setOnClickListener(galleryListener);
     }
 
     /**
-     * Listener to detect button press
+     * Listeners to detect button press
      */
     View.OnClickListener captureListener = new View.OnClickListener() {
         @Override
@@ -83,6 +84,16 @@ public class MainActivity extends ActionBarActivity {
             // Start CameraActivity
             Intent startCustomCameraIntent = new Intent(MainActivity.this, CameraActivity.class);
             startActivityForResult(startCustomCameraIntent, REQUEST_CAMERA);
+        }
+    };
+
+    View.OnClickListener galleryListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            // Start CameraActivity
+            Intent galleryIntent = new Intent(Intent.ACTION_VIEW,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivity(galleryIntent);
         }
     };
 
@@ -95,9 +106,6 @@ public class MainActivity extends ActionBarActivity {
             Uri photoUri = data.getData();
             mPath = photoUri.toString();
             Log.e("URI", mPath);
-//            Toast.makeText(getApplicationContext(),
-//                    "Your original picture has been saved to: " + mPath,
-//                    Toast.LENGTH_LONG).show();
             Bitmap originalPic = BitmapFactory.decodeFile(mPath.replace("file://", ""));
 
             if (originalPic != null) {
@@ -118,9 +126,6 @@ public class MainActivity extends ActionBarActivity {
                             , Toast.LENGTH_LONG).show();
                     return;
                 }
-//                Toast.makeText(getApplicationContext()
-//                        , "Your edited file has been saved to: " + mPath
-//                        , Toast.LENGTH_LONG).show();
 
                 // Refresh gallery
                 Intent mediaScannerIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
