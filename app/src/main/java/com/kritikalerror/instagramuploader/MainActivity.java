@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
@@ -216,6 +215,7 @@ public class MainActivity extends ActionBarActivity {
                 shareIntent.setType("image/*");
 
                 startActivity(shareIntent);
+                //startActivity(Intent.createChooser(shareIntent, "Share to"));
             } else {
                 new AlertDialog.Builder(MainActivity.this)
                     .setTitle("Instagram not found!")
@@ -240,27 +240,6 @@ public class MainActivity extends ActionBarActivity {
         else
         {
             Log.e("INSTAFAIL", "mPath is: " + mPath);
-        }
-    }
-
-    private void createInstagramIntent(String type, String mediaPath){
-        if (!mPath.equals("")) {
-            // Create the new Intent using the 'Send' action.
-            Intent share = new Intent(Intent.ACTION_SEND);
-
-            // Set the MIME type
-            share.setType(type);
-
-            // Create the URI from the media
-            File media = new File(mediaPath);
-            //Uri uri = Uri.fromFile(media);
-            Uri uri = Uri.parse(mediaPath);
-
-            // Add the URI to the Intent.
-            share.putExtra(Intent.EXTRA_STREAM, uri);
-
-            // Broadcast the Intent.
-            startActivity(Intent.createChooser(share, "Share to"));
         }
     }
 
