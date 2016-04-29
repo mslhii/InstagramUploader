@@ -1,15 +1,19 @@
 package com.kritikalerror.instagramuploader;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -39,6 +43,7 @@ public class MainActivity extends ActionBarActivity {
     private static String mPath;
 
     private static final int REQUEST_CAMERA = 0;
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,6 +59,63 @@ public class MainActivity extends ActionBarActivity {
 
     public void onResume() {
         super.onResume();
+    }
+
+    private void showOKAlertMessage(String message, DialogInterface.OnClickListener okListener) {
+        new android.support.v7.app.AlertDialog.Builder(MainActivity.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+    private boolean initializeWrapper() {
+        int hasSMSPermission = ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.SEND_SMS);
+        if (hasSMSPermission != PackageManager.PERMISSION_GRANTED) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.SEND_SMS)) {
+                showOKAlertMessage("You need to allow app to send SMS",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[]{Manifest.permission.SEND_SMS},
+                                        REQUEST_CODE_ASK_PERMISSIONS);
+                            }
+                        });
+                return false;
+            }
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[] {Manifest.permission.SEND_SMS},
+                    REQUEST_CODE_ASK_PERMISSIONS);
+            return false;
+        }
+
+        int hasReadContactsPermission = ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.READ_CONTACTS);
+        if (hasReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.READ_CONTACTS)) {
+                showOKAlertMessage("You need to allow access to Contacts",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[]{Manifest.permission.READ_CONTACTS},
+                                        REQUEST_CODE_ASK_PERMISSIONS);
+                            }
+                        });
+                return false;
+            }
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[] {Manifest.permission.READ_CONTACTS},
+                    REQUEST_CODE_ASK_PERMISSIONS);
+            return false;
+        }
+        this.initialize();
+        return true;
     }
 
     /**
