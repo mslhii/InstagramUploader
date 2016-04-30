@@ -71,24 +71,24 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private boolean initializeWrapper() {
-        int hasSMSPermission = ContextCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.SEND_SMS);
-        if (hasSMSPermission != PackageManager.PERMISSION_GRANTED) {
+        int hasCameraPermission = ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.CAMERA);
+        if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
             if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.SEND_SMS)) {
-                showOKAlertMessage("You need to allow app to send SMS",
+                    Manifest.permission.CAMERA)) {
+                showOKAlertMessage("You need to allow app to use the camera",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 ActivityCompat.requestPermissions(MainActivity.this,
-                                        new String[]{Manifest.permission.SEND_SMS},
+                                        new String[]{Manifest.permission.CAMERA},
                                         REQUEST_CODE_ASK_PERMISSIONS);
                             }
                         });
                 return false;
             }
             ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[] {Manifest.permission.SEND_SMS},
+                    new String[] {Manifest.permission.CAMERA},
                     REQUEST_CODE_ASK_PERMISSIONS);
             return false;
         }
