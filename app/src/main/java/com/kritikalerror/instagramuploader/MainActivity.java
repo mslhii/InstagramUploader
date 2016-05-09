@@ -94,16 +94,16 @@ public class MainActivity extends ActionBarActivity {
         }
 
         int hasReadContactsPermission = ContextCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.READ_CONTACTS);
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (hasReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
             if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.READ_CONTACTS)) {
-                showOKAlertMessage("You need to allow access to Contacts",
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                showOKAlertMessage("You need to allow access to external storage to save photos",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 ActivityCompat.requestPermissions(MainActivity.this,
-                                        new String[]{Manifest.permission.READ_CONTACTS},
+                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         REQUEST_CODE_ASK_PERMISSIONS);
                             }
                         });
