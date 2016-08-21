@@ -77,7 +77,7 @@ public class MainActivity extends ActionBarActivity {
         if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
             if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
                     Manifest.permission.CAMERA)) {
-                showOKAlertMessage("You need to allow app to use the camera",
+                showOKAlertMessage("You need to allow app to use the camera for the app to function properly",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -86,20 +86,18 @@ public class MainActivity extends ActionBarActivity {
                                         REQUEST_CODE_ASK_PERMISSIONS);
                             }
                         });
-                //return false;
             }
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[] {Manifest.permission.CAMERA},
                     REQUEST_CODE_ASK_PERMISSIONS);
-            //return false;
         }
 
-        int hasReadContactsPermission = ContextCompat.checkSelfPermission(MainActivity.this,
+        int hasWriteStoragePermission = ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (hasReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
+        if (hasWriteStoragePermission != PackageManager.PERMISSION_GRANTED) {
             if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                showOKAlertMessage("You need to allow access to external storage to save photos",
+                showOKAlertMessage("You need to allow access to external storage to save photos for the app to function properly",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -108,12 +106,10 @@ public class MainActivity extends ActionBarActivity {
                                         REQUEST_CODE_ASK_PERMISSIONS);
                             }
                         });
-                //return false;
             }
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[] {Manifest.permission.READ_CONTACTS},
                     REQUEST_CODE_ASK_PERMISSIONS);
-            //return false;
         }
         this.initialize();
         return true;
