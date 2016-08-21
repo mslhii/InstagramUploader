@@ -86,12 +86,12 @@ public class MainActivity extends ActionBarActivity {
                                         REQUEST_CODE_ASK_PERMISSIONS);
                             }
                         });
-                return false;
+                //return false;
             }
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[] {Manifest.permission.CAMERA},
                     REQUEST_CODE_ASK_PERMISSIONS);
-            return false;
+            //return false;
         }
 
         int hasReadContactsPermission = ContextCompat.checkSelfPermission(MainActivity.this,
@@ -108,12 +108,12 @@ public class MainActivity extends ActionBarActivity {
                                         REQUEST_CODE_ASK_PERMISSIONS);
                             }
                         });
-                return false;
+                //return false;
             }
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[] {Manifest.permission.READ_CONTACTS},
                     REQUEST_CODE_ASK_PERMISSIONS);
-            return false;
+            //return false;
         }
         this.initialize();
         return true;
