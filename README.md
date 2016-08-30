@@ -5,6 +5,6 @@ Uses the SquareCamera library and then generates an image with a "Shot On iPhone
 
 No iPhone 6s version in the works now. Not much time to work.
 
-Download v1.0.5 at https://play.google.com/store/apps/details?id=com.kritikalerror.instagramuploader
+Download v1.0.6 at https://play.google.com/store/apps/details?id=com.kritikalerror.instagramuploader
 
 coming soon...
