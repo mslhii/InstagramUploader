@@ -53,8 +53,8 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mContext = this;
-        initialize();
-        //initializeWrapper();
+        //initialize();
+        initializeWrapper();
         mPath = "";
     }
 
@@ -71,49 +71,49 @@ public class MainActivity extends ActionBarActivity {
                 .show();
     }
 
-//    private boolean initializeWrapper() {
-//        int hasCameraPermission = ContextCompat.checkSelfPermission(MainActivity.this,
-//                Manifest.permission.CAMERA);
-//        if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
-//            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-//                    Manifest.permission.CAMERA)) {
-//                showOKAlertMessage("You need to allow app to use the camera for the app to function properly",
-//                        new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                ActivityCompat.requestPermissions(MainActivity.this,
-//                                        new String[]{Manifest.permission.CAMERA},
-//                                        REQUEST_CODE_ASK_PERMISSIONS);
-//                            }
-//                        });
-//            }
-//            ActivityCompat.requestPermissions(MainActivity.this,
-//                    new String[] {Manifest.permission.CAMERA},
-//                    REQUEST_CODE_ASK_PERMISSIONS);
-//        }
-//
-//        int hasWriteStoragePermission = ContextCompat.checkSelfPermission(MainActivity.this,
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//        if (hasWriteStoragePermission != PackageManager.PERMISSION_GRANTED) {
-//            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-//                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-//                showOKAlertMessage("You need to allow access to external storage to save photos for the app to function properly",
-//                        new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                ActivityCompat.requestPermissions(MainActivity.this,
-//                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                                        REQUEST_CODE_ASK_PERMISSIONS);
-//                            }
-//                        });
-//            }
-//            ActivityCompat.requestPermissions(MainActivity.this,
-//                    new String[] {Manifest.permission.READ_CONTACTS},
-//                    REQUEST_CODE_ASK_PERMISSIONS);
-//        }
-//        this.initialize();
-//        return true;
-//    }
+    private boolean initializeWrapper() {
+        int hasCameraPermission = ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.CAMERA);
+        if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.CAMERA)) {
+                showOKAlertMessage("You need to allow app to use the camera for the app to function properly",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[]{Manifest.permission.CAMERA},
+                                        REQUEST_CODE_ASK_PERMISSIONS);
+                            }
+                        });
+            }
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[] {Manifest.permission.CAMERA},
+                    REQUEST_CODE_ASK_PERMISSIONS);
+        }
+
+        int hasWriteStoragePermission = ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (hasWriteStoragePermission != PackageManager.PERMISSION_GRANTED) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                showOKAlertMessage("You need to allow access to external storage to save photos for the app to function properly",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        REQUEST_CODE_ASK_PERMISSIONS);
+                            }
+                        });
+            }
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[] {Manifest.permission.READ_CONTACTS},
+                    REQUEST_CODE_ASK_PERMISSIONS);
+        }
+        this.initialize();
+        return true;
+    }
 
     /**
      * Initialize preview surface
