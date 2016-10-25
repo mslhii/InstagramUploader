@@ -87,15 +87,17 @@ public class MainActivity extends ActionBarActivity {
         List<String> permissionsNeeded = new ArrayList<String>();
 
         final List<String> permissionsList = new ArrayList<String>();
-        if (!addPermission(permissionsList, Manifest.permission.READ_CONTACTS))
-            permissionsNeeded.add("Read Contacts");
-        if (!addPermission(permissionsList, Manifest.permission.SEND_SMS))
-            permissionsNeeded.add("Write Contacts");
+        if (!addPermission(permissionsList, Manifest.permission.CAMERA))
+            permissionsNeeded.add("Camera");
+        if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            permissionsNeeded.add("Write to External Storage");
+        if (!addPermission(permissionsList, Manifest.permission.INTERNET))
+            permissionsNeeded.add("Internet Access");
 
         if (permissionsList.size() > 0) {
             if (permissionsNeeded.size() > 0) {
                 // Need Rationale
-                String message = "You need to grant access to " + permissionsNeeded.get(0);
+                String message = "You need to grant access to: " + permissionsNeeded.get(0);
                 for (int i = 1; i < permissionsNeeded.size(); i++)
                     message = message + ", " + permissionsNeeded.get(i);
                 showOKAlertMessage(message,
@@ -106,59 +108,17 @@ public class MainActivity extends ActionBarActivity {
                                         REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
                             }
                         });
+                this.initialize();
                 return true;
             }
             ActivityCompat.requestPermissions(MainActivity.this, permissionsList.toArray(new String[permissionsList.size()]),
                     REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+            this.initialize();
             return true;
         }
         this.initialize();
         return true;
     }
-
-//    private boolean initializeWrapperDeprecated() {
-//        int hasCameraPermission = ContextCompat.checkSelfPermission(MainActivity.this,
-//                Manifest.permission.CAMERA);
-//        if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
-//            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-//                    Manifest.permission.CAMERA)) {
-//                showOKAlertMessage("You need to allow app to use the camera for the app to function properly",
-//                        new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                ActivityCompat.requestPermissions(MainActivity.this,
-//                                        new String[]{Manifest.permission.CAMERA},
-//                                        REQUEST_CODE_ASK_PERMISSIONS);
-//                            }
-//                        });
-//            }
-//            ActivityCompat.requestPermissions(MainActivity.this,
-//                    new String[] {Manifest.permission.CAMERA},
-//                    REQUEST_CODE_ASK_PERMISSIONS);
-//        }
-//
-//        int hasWriteStoragePermission = ContextCompat.checkSelfPermission(MainActivity.this,
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//        if (hasWriteStoragePermission != PackageManager.PERMISSION_GRANTED) {
-//            if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-//                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-//                showOKAlertMessage("You need to allow access to external storage to save photos for the app to function properly",
-//                        new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                ActivityCompat.requestPermissions(MainActivity.this,
-//                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                                        REQUEST_CODE_ASK_PERMISSIONS);
-//                            }
-//                        });
-//            }
-//            ActivityCompat.requestPermissions(MainActivity.this,
-//                    new String[] {Manifest.permission.READ_CONTACTS},
-//                    REQUEST_CODE_ASK_PERMISSIONS);
-//        }
-//        this.initialize();
-//        return true;
-//    }
 
     /**
      * Initialize preview surface
