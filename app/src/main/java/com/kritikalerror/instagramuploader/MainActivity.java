@@ -55,7 +55,6 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mContext = this;
-        //initialize();
         initializeWrapper();
         mPath = "";
     }
